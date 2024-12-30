@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useLoadScript } from "@react-google-maps/api";
-import './App.css'; // Import the updated CSS file
+import "./App.css";
 import MapComponent from "./Components/MapComponent";
 import ButtonContainer from "./Components/ButtonContainer";
 import AddressForm from "./Components/AddressForm";
@@ -8,10 +8,11 @@ import SavedAddresses from "./Components/SavedAddress";
 
 const libraries = ["places"];
 const center = { lat: 37.7749, lng: -122.4194 };
+const apiKey = import.meta.env.VITE_APP_API_KEY;
 
 function App() {
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: "AIzaSyCgQHPtD2gAzsp7fnrFN6bt8ZPh2pIKMHU",
+    googleMapsApiKey: apiKey,
     libraries,
   });
 
@@ -19,47 +20,30 @@ function App() {
   const [address, setAddress] = useState("");
   const [addressType, setAddressType] = useState("Home");
   const [savedAddresses, setSavedAddresses] = useState([]);
-  const [autocomplete, setAutocomplete] = useState(null);
   const [manualSearch, setManualSearch] = useState(false);
 
   const customMarkerImage = "https://cdn-icons-png.flaticon.com/128/684/684908.png";
 
-  const autocompleteRef = useRef(null); // Ref to store the Autocomplete instance
-
   useEffect(() => {
-    const fetchAddresses = async () => {
-      setSavedAddresses([
-        { id: 1, type: "Home", details: "123 Main St, SF, CA" },
-        { id: 2, type: "Office", details: "456 Market St, SF, CA" },
-        { id: 3, type: "Custom", details: "789 Pine St, SF, CA" },
-      ]);
-    };
-    fetchAddresses();
+    setSavedAddresses([
+      { id: 1, type: "Home", details: "123 Main St, SF, CA", coordinates: { lat: 37.7749, lng: -122.4194 } },
+      { id: 2, type: "Office", details: "456 Market St, SF, CA", coordinates: { lat: 37.7849, lng: -122.4094 } },
+    ]);
   }, []);
-
-  useEffect(() => {
-    if (window.google && address) {
-      const inputField = document.getElementById("address-input");
-      const options = {
-        types: ["geocode"],
-      };
-
-      const autocompleteInstance = new window.google.maps.places.Autocomplete(inputField, options);
-      setAutocomplete(autocompleteInstance); // Store autocomplete instance in state
-      autocompleteInstance.addListener("place_changed", handlePlaceSelect);
-
-      return () => {
-        if (autocompleteInstance) {
-          window.google.maps.event.clearInstanceListeners(autocompleteInstance);
-        }
-      };
-    }
-  }, [address]); // Re-run the effect when the address changes
 
   const handleMapClick = (event) => {
     const lat = event.latLng.lat();
     const lng = event.latLng.lng();
     setSelectedLocation({ lat, lng });
+  };
+
+  const handlePlaceSelect = (place) => {
+    if (place.geometry) {
+      setAddress(place.formatted_address);
+      const lat = place.geometry.location.lat();
+      const lng = place.geometry.location.lng();
+      setSelectedLocation({ lat, lng });
+    }
   };
 
   const handleSaveAddress = () => {
@@ -74,28 +58,21 @@ function App() {
     setAddressType("Home");
   };
 
-  const handlePlaceSelect = () => {
-    const place = autocomplete.getPlace();
-    if (place.geometry) {
-      setAddress(place.formatted_address);
-      const lat = place.geometry.location.lat();
-      const lng = place.geometry.location.lng();
-      setSelectedLocation({ lat, lng });
-    }
+  const handleSelectAddress = (addr) => {
+    setSelectedLocation(addr.coordinates);
+  };
+
+  const handleRemoveAddress = (id) => {
+    setSavedAddresses(savedAddresses.filter((addr) => addr.id !== id));
   };
 
   const enableLocation = () => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setSelectedLocation({ lat: latitude, lng: longitude });
-          setAddress("");
-        },
-        (error) => {
-          console.error("Error getting location:", error);
-        }
-      );
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        setSelectedLocation({ lat: latitude, lng: longitude });
+        setAddress("");
+      });
     } else {
       alert("Geolocation is not supported by this browser.");
     }
@@ -110,22 +87,17 @@ function App() {
 
   return (
     <div className="container">
-      <h1 className="title">Location</h1>
-
-      <div className="map-container">
-        <MapComponent
-          selectedLocation={selectedLocation}
-          handleMapClick={handleMapClick}
-          customMarkerImage={customMarkerImage}
-        />
-      </div>
-
+      <h1 className="title">Location App</h1>
+      <MapComponent className="map-container"
+        selectedLocation={selectedLocation}
+        handleMapClick={handleMapClick}
+        customMarkerImage={customMarkerImage}
+      />
       <ButtonContainer
         enableLocation={enableLocation}
         toggleManualSearch={toggleManualSearch}
         manualSearch={manualSearch}
       />
-
       {manualSearch && (
         <AddressForm
           address={address}
@@ -136,11 +108,11 @@ function App() {
           handleSaveAddress={handleSaveAddress}
         />
       )}
-
-      <div className="saved-addresses-container">
-        <h2 className="saved-addresses-title">Saved Addresses</h2>
-        <SavedAddresses savedAddresses={savedAddresses} />
-      </div>
+      <SavedAddresses
+        savedAddresses={savedAddresses}
+        onSelectAddress={handleSelectAddress}
+        onRemoveAddress={handleRemoveAddress}
+      />
     </div>
   );
 }

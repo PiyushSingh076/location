@@ -1,13 +1,40 @@
 import React from "react";
 
-const SavedAddresses = ({ savedAddresses }) => {
+const SavedAddresses = ({ savedAddresses, onSelectAddress, onRemoveAddress, onSaveAddress }) => {
   return (
     <div className="saved-addresses-container">
-      <h3 style={{ textAlign: "center" }}>Saved Addresses</h3>
-      <ul style={{ listStyleType: "none", padding: 0 }}>
-        {savedAddresses.map((addr) => (
-          <li key={addr.id} className="saved-address-item">
-            <span className="saved-address-type">{addr.type}:</span> {addr.details}
+     
+      {/* Save Address Button */}
+      <button
+        className="save-button"
+        onClick={onSaveAddress} // Trigger the function when clicked
+      >
+        Save Address
+      </button>
+      <h1 className="saved-address-title">Saved Addresses</h1>
+      
+      <ul 
+      className="saved-address-container"
+      style={{ listStyleType: "none", padding: 0 }}>
+        {savedAddresses.map((address) => (
+          <li key={address.id} className="saved-address-item">
+            <div>
+              <span>{address.type}:</span> {address.details}
+            </div>
+            <div>
+              <button
+                className="select-address-button"
+                onClick={() => onSelectAddress(address)}
+              >
+                Select
+              </button>
+              <button
+                className="remove-address-button"
+                onClick={() => onRemoveAddress(address.id)}
+              >
+                Remove
+              </button>
+            </div>
           </li>
         ))}
       </ul>
