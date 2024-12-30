@@ -1,34 +1,34 @@
 import React, { useEffect, useRef } from "react";
 import { GoogleMap } from "@react-google-maps/api";
 
-const defaultMarkerImage = "https://cdn-icons-png.flaticon.com/128/684/684908.png";
+
 
 const MapComponent = ({ selectedLocation, handleMapClick }) => {
-  const mapRef = useRef(null); // Reference to hold the map instance
-  const markerRef = useRef(null); // Reference to hold the marker instance
+  const mapRef = useRef(null); 
+  const markerRef = useRef(null); 
 
   // Initialize map and marker on map load
   useEffect(() => {
     if (mapRef.current && selectedLocation) {
       const googleMap = mapRef.current;
 
-      // Create a new marker
+      
       if (markerRef.current) {
-        markerRef.current.setPosition(selectedLocation); // Update marker position if already exists
+        markerRef.current.setPosition(selectedLocation); 
       } else {
         markerRef.current = new window.google.maps.Marker({
           position: selectedLocation,
           map: googleMap,
           icon: {
             url: defaultMarkerImage,
-            scaledSize: new window.google.maps.Size(40, 40), // Marker size adjustment
+            scaledSize: new window.google.maps.Size(40, 40),
           },
         });
       }
 
-      googleMap.setCenter(selectedLocation); // Center the map on the selected location
+      googleMap.setCenter(selectedLocation); 
     }
-  }, [selectedLocation]); // Re-run whenever selectedLocation changes
+  }, [selectedLocation]); 
 
   return (
     <GoogleMap
@@ -38,7 +38,7 @@ const MapComponent = ({ selectedLocation, handleMapClick }) => {
       center={selectedLocation}
       onClick={handleMapClick}
       onLoad={(map) => {
-        mapRef.current = map; // Set map instance
+        mapRef.current = map; 
       }}
     />
   );
