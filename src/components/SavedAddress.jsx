@@ -4,13 +4,7 @@ const SavedAddresses = ({ savedAddresses, onSelectAddress, onRemoveAddress, onSa
   return (
     <div className="saved-addresses-container">
      
-      {/* Save Address Button */}
-      <button
-        className="save-button"
-        onClick={onSaveAddress} // Trigger the function when clicked
-      >
-        Save Address
-      </button>
+     
       <h1 className="saved-address-title">Saved Addresses</h1>
       
       <ul 
