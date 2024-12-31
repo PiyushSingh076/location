@@ -26,8 +26,8 @@ function App() {
 
   useEffect(() => {
     setSavedAddresses([
-      { id: 1, type: "Home", details: "123 Main St, SF, CA", coordinates: { lat: 37.7749, lng: -122.4194 } },
-      { id: 2, type: "Office", details: "456 Market St, SF, CA", coordinates: { lat: 37.7849, lng: -122.4094 } },
+      { id: 1, type: "Office", details: "123 Main St, SF, CA", coordinates: { lat: 37.7749, lng: -122.4194 } }
+      
     ]);
   }, []);
 
