@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { GoogleMap } from "@react-google-maps/api";
 
-
+const defaultMarkerImage = "https://cdn-icons-png.flaticon.com/128/684/684908.png";
 
 const MapComponent = ({ selectedLocation, handleMapClick }) => {
   const mapRef = useRef(null); 
